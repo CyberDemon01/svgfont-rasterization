@@ -611,7 +611,7 @@ int main() {
 		return buf;
 	};
 
-	const int h = 48;
+	const int h = 32;
 
 	int width = 1270;
 	int height = 720;
@@ -630,29 +630,35 @@ int main() {
 	unordered_map<char, vector<vec3b>> char_info = {};
 	for (int ch = 0; ch < 256; ch++) {
 		if (isprint(ch)) {
-			if (isdigit(ch))
-				char_info[ch] = move(gbuf(ch, h, {255, 255, 0}));
-			else
+
 				char_info[ch] = move(gbuf(ch, h, {255, 255, 255}));
 		}
 	}
 
 	vector<string> text = {
-		"func heapify(a[], i, size) {",
-		"  ls = (i << 1) + 1",
-		"  rs = (i << 1) + 2",
-		"  while (ls < size) {",
-		"    k = ls",
-		"    if (rs < size and a[rs] > a[ls])",
-		"      k = rs",
-		"    if (a[i] >= a[k])",
-		"      break",
-		"    swap(a[i], a[k])",
-		"    i = k",
-		"    ls = (i << 1) + 1",
-		"    rs = (i << 1) + 2",
-		"  }",
-		"}",
+		"#include <iostream>",
+                "",
+                "int partition(int a[], int l, int r) {",
+                "  int k = l;",
+                "  for (int i = l; i < r; i++) {",
+                "    if (a[i] < a[r])",
+                "      swap(a[i], a[k++]);",
+                "  }",
+                "  swap(a[k], a[r]);",
+                "  return k;",
+                "}",
+                "",
+                "void qsort(int a[], int l, int r) {",
+                "  while (l < r) {",
+                "    int k = partition(a, l, r);",
+                "    qsort(a, l, k);",
+                "    l = k;",
+                "  }",
+                "}",
+                "",
+                "int main() {",
+                "  return 0;",
+                "}",
 	};
 
 	render.clear(colors::black);
