@@ -602,9 +602,9 @@ int main() {
 		for (int y = 0; y < units_per_em * scale / aa_scale_factor; y++) {
 			for (int x = 0; x + 2 < units_per_em * scale; x++) {
 				buf[y * h + x / aa_scale_factor] = vec3b(
-					blur[y][x + 0] * col.r,
-					blur[y][x + 1] * col.g,
-					blur[y][x + 2] * col.b
+					(1 - blur[y][x + 0]) * col.r,
+					(1 - blur[y][x + 1]) * col.g,
+					(1 - blur[y][x + 2]) * col.b
 				);
 			}
 		}
@@ -630,8 +630,7 @@ int main() {
 	unordered_map<char, vector<vec3b>> char_info = {};
 	for (int ch = 0; ch < 256; ch++) {
 		if (isprint(ch)) {
-
-				char_info[ch] = move(gbuf(ch, h, {255, 255, 255}));
+			char_info[ch] = move(gbuf(ch, h, colors::white));
 		}
 	}
 
@@ -661,7 +660,7 @@ int main() {
                 "}",
 	};
 
-	render.clear(colors::black);
+	render.clear(colors::white);
 	int y = 10;
 	for (const auto &s : text) {
 		int x = 10;
