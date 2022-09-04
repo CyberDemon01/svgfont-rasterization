@@ -378,7 +378,7 @@ int main() {
 	cout << "commands done" << endl;
 
 	// rasterization
-	auto gbuf = [&](char ch, int h, vec3f col) {
+	auto gbuf = [&](char ch, int h, vec3f bg, vec3f fg) {
 		const float aa_scale_factor = 3.0f;
 		const float scale = aa_scale_factor * h / static_cast<float>(units_per_em);
 
@@ -602,9 +602,9 @@ int main() {
 		for (int y = 0; y < units_per_em * scale / aa_scale_factor; y++) {
 			for (int x = 0; x + 2 < units_per_em * scale; x++) {
 				buf[y * h + x / aa_scale_factor] = vec3b(
-					(1 - blur[y][x + 0]) * col.r,
-					(1 - blur[y][x + 1]) * col.g,
-					(1 - blur[y][x + 2]) * col.b
+					bg.r + (fg.r - bg.r) * blur[y][x + 0],
+					bg.g + (fg.g - bg.g) * blur[y][x + 1],
+					bg.b + (fg.b - bg.b) * blur[y][x + 2]
 				);
 			}
 		}
@@ -627,10 +627,13 @@ int main() {
 	);
 	assert(texture);
 
+	vec3f bg = colors::blue;
+	vec3f fg = colors::black;
+
 	unordered_map<char, vector<vec3b>> char_info = {};
 	for (int ch = 0; ch < 256; ch++) {
 		if (isprint(ch)) {
-			char_info[ch] = move(gbuf(ch, h, colors::white));
+			char_info[ch] = move(gbuf(ch, h, bg, fg));
 		}
 	}
 
@@ -660,7 +663,7 @@ int main() {
                 "}",
 	};
 
-	render.clear(colors::white);
+	render.clear(bg);
 	int y = 10;
 	for (const auto &s : text) {
 		int x = 10;
@@ -668,7 +671,7 @@ int main() {
 			SDL_UpdateTexture(texture, nullptr, char_info[ch].data(), h * sizeof(vec3b));
 			SDL_Rect srect = {x, y, h, h};
 			SDL_RenderCopy(render.renderer, texture, nullptr, &srect);
-			x += h * 0.6f;
+			x += h * 0.5f;
 		}
 		y += h;
 	}
